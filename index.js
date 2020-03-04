@@ -33,9 +33,9 @@ app.get('/', function(req, res) {
                     'output-response': JSON.parse(body)
                 }
                 return res.send(addressPayload)
-             } else {
+            } else {
                 return res.send(addressPayloadMock)
-             }
+            }
         })
     }
 })
