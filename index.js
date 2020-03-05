@@ -39,3 +39,37 @@ app.get('/', function(req, res) {
         })
     }
 })
+
+app.get('/reverse_geocode', function(req, res) {
+    var addressPayloadMock = {
+        'status': 'success',
+        'output-response': 'coords, etc.'
+    }
+    if(!req.query.longitude) {
+        return res.send({'status': 'error', 'message': 'missing longitude'})
+    } else if(!req.query.latitude) {
+        return res.send({'status': 'error', 'message': 'missing latitude'})
+    } else {
+        var longitude = req.query.longitude
+        var latitude = req.query.latitude
+        var coords = longitude+','+latitude
+        var cachebuster = Math.round(new Date().getTime() / 1000)
+        var url = 'https://api.mapbox.com/geocoding/v5/mapbox.places/' +  coords +'.json?access_token=' + config.mapBoxAPIKey + '&cachebuster=' + cachebuster + '&autocomplete=true&types=address'
+        console.log('url:', url)
+        request(url, function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+                console.log(body)
+                var addressPayload = {
+                    'status': 'success',
+                    'input_longitude': longitude,
+                    'input_latitude': latitude,
+                    'output_response': JSON.parse(body)
+                }
+                return res.send(addressPayload)
+            } else {
+                return res.send(addressPayloadMock)
+            }
+        })
+    }
+})
+//
